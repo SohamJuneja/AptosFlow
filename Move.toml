@@ -1,0 +1,11 @@
+[package]
+name = "AptosFlow"
+version = "1.0.0"
+
+[addresses]
+aptosflow_addr = "d2d618ed1248e1ac5f715991af3de929f8f4aa064983956c01ca77521178ed05"
+
+[dependencies.AptosFramework]
+git = "https://github.com/aptos-labs/aptos-core.git"
+rev = "devnet"
+subdir = "aptos-move/framework/aptos-framework"
