@@ -2,12 +2,10 @@ import Head from "next/head";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowRight } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Sparkles } from "lucide-react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
+import { useState } from "react";
 import { Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -20,48 +18,75 @@ const stringToHex = (str) => '0x' + Array.from(str).map(c => c.charCodeAt(0).toS
 
 export default function CreateWorkflow() {
   const { account, signAndSubmitTransaction } = useWallet();
-  const [trigger, setTrigger] = useState("");
-  const [action, setAction] = useState("");
-  const [amount, setAmount] = useState("");
+  const [prompt, setPrompt] = useState("");
+  
+  // State will now hold the full objects from the AI
+  const [trigger, setTrigger] = useState(null);
+  const [actions, setActions] = useState([]);
+  
+  const [isParsing, setIsParsing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const router = useRouter();
 
-  useEffect(() => {
-    if (router.isReady) {
-      const { trigger: queryTrigger, action: queryAction } = router.query;
-      if (queryTrigger) setTrigger(queryTrigger);
-      if (queryAction) setAction(queryAction);
+  const handleParsePrompt = async () => {
+    if (!prompt) {
+      toast.error("Please enter a command for the AI.");
+      return;
     }
-  }, [router.isReady, router.query]);
+    setIsParsing(true);
+    toast.loading("Interpreting your command...");
+
+    try {
+      const response = await fetch('/api/parse-prompt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt }),
+      });
+
+      const data = await response.json();
+      toast.dismiss();
+
+      if (data.error) {
+        toast.error("AI could not understand the command.", { description: data.error });
+        setTrigger(null);
+        setActions([]);
+      } else {
+        toast.success("AI command parsed successfully!");
+        setTrigger(data.trigger || null);
+        setActions(data.actions || []);
+      }
+    } catch (error) {
+      toast.dismiss();
+      toast.error("Failed to communicate with AI.", { description: error.message });
+    } finally {
+      setIsParsing(false);
+    }
+  };
 
   const handleCreateWorkflow = async () => {
-    if (!account) { toast.error("Please connect your wallet first!"); return; }
-    if (!trigger || !action) { toast.error("Please select a trigger and an action."); return; }
+    if (!account || !trigger || actions.length === 0) {
+      toast.error("Please parse a valid command with the AI first.");
+      return;
+    }
     setIsSubmitting(true);
     toast.loading("Submitting transaction...");
-    let actionPayloadObject = {};
-    const actionDescription = `Action: ${action} ${amount}`;
-    if (action === "tapp-swap") { actionPayloadObject = { type: "entry_function_payload", function: "0x123...::tapp_swap::swap_script", type_arguments: ["0x1::aptos_coin::AptosCoin", "0x456...::usdc::USDC"], arguments: [amount], }; }
-    else if (action === "hyperion-lp") { actionPayloadObject = { type: "entry_function_payload", function: "0x789...::hyperion::rebalance", arguments: [], }; }
-    else { actionPayloadObject = { type: "generic_action", details: actionDescription, }; }
+    
+    // We can now build a much richer payload
+    const actionPayloadObject = { trigger, actions };
+    const actionDescription = `AI Workflow: ${actions.map(a => a.type).join(', ')}`;
     const payloadString = JSON.stringify(actionPayloadObject);
     const hexPayload = stringToHex(payloadString);
-    const transaction = { sender: account.address, data: { function: `${MODULE_ADDRESS}::workflow::create_workflow`, functionArguments: [`Trigger: ${trigger}`, actionDescription, hexPayload,], }, };
+
+    const transaction = {
+      sender: account.address,
+      data: {
+        function: `${MODULE_ADDRESS}::workflow::create_workflow`,
+        functionArguments: [prompt, actionDescription, hexPayload],
+      },
+    };
     try {
       const response = await signAndSubmitTransaction(transaction);
       toast.dismiss();
-      toast.success("Workflow submitted successfully!", { 
-        description: `Transaction hash: ${response.hash.slice(0, 10)}...`, 
-        action: { 
-          label: "View on Explorer", 
-          onClick: () => window.open(`https://explorer.aptoslabs.com/txn/${response.hash}?network=testnet`, "_blank"), 
-        }, 
-      });
-      
-      // Navigate back to home page after 2 seconds
-      setTimeout(() => {
-        router.push('/');
-      }, 2000);
+      toast.success("Workflow submitted successfully!", { description: `Transaction hash: ${response.hash.slice(0, 10)}...`, action: { label: "View on Explorer", onClick: () => window.open(`https://explorer.aptoslabs.com/txn/${response.hash}?network=testnet`, "_blank"), }, });
     } catch (error) {
       toast.dismiss();
       toast.error("Transaction failed.", { description: error.message || "Please try again.", });
@@ -72,35 +97,41 @@ export default function CreateWorkflow() {
 
   return (
     <>
-      <Head><title>Create Workflow - AptosFlow</title></Head>
+      <Head><title>Create AI Workflow - AptosFlow</title></Head>
       <main className="flex min-h-screen flex-col text-white">
         <Header />
         <div className="flex flex-1 flex-col items-center justify-center p-4">
-          <motion.h1 initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="text-4xl font-bold mb-8">Create a New Workflow</motion.h1>
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2, duration: 0.5 }} className="flex w-full max-w-4xl items-center justify-center gap-8">
-            <Card className="w-1/2 bg-black/20 border-white/10 backdrop-blur-sm">
-              <CardHeader><CardTitle className="text-center text-2xl text-slate-200">When this happens...</CardTitle></CardHeader>
+          <motion.h1 initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="text-4xl font-bold mb-8">Create Workflow with AI</motion.h1>
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2, duration: 0.5 }} className="w-full max-w-2xl">
+            <Card className="bg-black/20 border-white/10 backdrop-blur-sm">
+              <CardHeader><CardTitle className="text-center text-2xl text-slate-200">Describe your desired workflow</CardTitle></CardHeader>
               <CardContent className="space-y-4">
-                <label className="text-sm font-medium text-slate-400">Trigger</label>
-                <Select value={trigger} onValueChange={setTrigger}><SelectTrigger className="w-full bg-black/30 border-white/20 cursor-pointer hover:bg-black/40 transition-all"><SelectValue placeholder="Select a trigger" /></SelectTrigger><SelectContent className="bg-background/80 backdrop-blur-lg border-white/10 text-white"><SelectItem value="receive-apt" className="cursor-pointer hover:bg-white/10">Receive APT</SelectItem><SelectItem value="receive-usdc" className="cursor-pointer hover:bg-white/10">Receive USDC</SelectItem></SelectContent></Select>
-              </CardContent>
-            </Card>
-            <ArrowRight className="h-12 w-12 text-slate-500" />
-            <Card className="w-1/2 bg-black/20 border-white/10 backdrop-blur-sm">
-              <CardHeader><CardTitle className="text-center text-2xl text-slate-200">Do this...</CardTitle></CardHeader>
-              <CardContent className="space-y-4">
-                <label className="text-sm font-medium text-slate-400">Action</label>
-                <Select value={action} onValueChange={setAction}><SelectTrigger className="w-full bg-black/30 border-white/20 cursor-pointer hover:bg-black/40 transition-all"><SelectValue placeholder="Select an action" /></SelectTrigger><SelectContent className="bg-background/80 backdrop-blur-lg border-white/10 text-white"><SelectItem value="tapp-swap" className="cursor-pointer hover:bg-white/10">Swap Token (Tapp.Exchange)</SelectItem><SelectItem value="hyperion-lp" className="cursor-pointer hover:bg-white/10">Rebalance LP (Hyperion)</SelectItem><SelectItem value="kana-trade" className="cursor-pointer hover:bg-white/10">Execute Trade (Kana Perps)</SelectItem></SelectContent></Select>
-                <div>
-                  <label className="text-sm font-medium text-slate-400">Amount</label>
-                  <Input placeholder="e.g., 10.5" className="bg-black/30 border-white/20" value={amount} onChange={(e) => setAmount(e.target.value)} />
-                </div>
+                <Textarea
+                  placeholder="e.g., 'when i get usdc, swap it on tapp for apt'"
+                  className="bg-black/30 border-white/20 min-h-[100px] text-lg font-mono"
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                />
+                <Button onClick={handleParsePrompt} disabled={isParsing} className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold">
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  {isParsing ? "Interpreting..." : "Interpret with AI"}
+                </Button>
+                
+                {/* THIS IS THE CORRECTED DISPLAY LOGIC */}
+                {(trigger || actions.length > 0) && (
+                  <div className="text-sm p-4 bg-black/30 rounded-lg border border-white/20">
+                    <p className="font-bold mb-2">AI Interpretation:</p>
+                    <pre className="text-xs text-left whitespace-pre-wrap font-mono">
+                      {JSON.stringify({ trigger, actions }, null, 2)}
+                    </pre>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </motion.div>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.5 }}>
-            <Button onClick={handleCreateWorkflow} disabled={isSubmitting} size="lg" className="mt-12 text-lg bg-gradient-to-r from-primary to-accent hover:from-accent hover:to-primary text-white font-bold px-8 py-4 rounded-lg border-2 border-primary/50 hover:border-primary shadow-lg hover:shadow-xl transform hover:scale-105 cursor-pointer disabled:cursor-not-allowed disabled:hover:scale-100 disabled:opacity-50 transition-all duration-300">
-              {isSubmitting ? "Submitting..." : "Create Workflow"}
+            <Button onClick={handleCreateWorkflow} disabled={isSubmitting || !trigger || actions.length === 0} size="lg" className="mt-12 text-lg bg-primary hover:bg-accent text-primary-foreground font-bold shadow-glow-cyan-light hover:shadow-glow-cyan transition-all transform hover:scale-105">
+              {isSubmitting ? "Submitting..." : "Create Workflow from AI Result"}
             </Button>
           </motion.div>
         </div>
