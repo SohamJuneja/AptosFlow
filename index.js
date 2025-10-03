@@ -55,6 +55,20 @@ app.post('/webhook', async (req, res) => {
         },
     });
 
+    // 🔍 Display the hex payload for debugging
+    console.log("\n📦 === TRANSACTION DETAILS ===");
+    console.log(`🔗 Function: ${MODULE_ADDRESS}::workflow::execute_workflow`);
+    console.log(`📋 Arguments: [${workflowId}]`);
+    console.log(`💾 Raw Transaction:`, JSON.stringify(transaction, null, 2));
+    
+    // Get the hex payload
+    const hexPayload = transaction.rawTransaction;
+    if (hexPayload) {
+        console.log(`🔢 Hex Payload: ${Buffer.from(hexPayload).toString('hex')}`);
+    }
+    
+    console.log("=".repeat(40));
+
     const committedTxn = await aptos.signAndSubmitTransaction({
         signer: adminAccount,
         transaction: transaction,
