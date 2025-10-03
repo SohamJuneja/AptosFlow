@@ -1,32 +1,78 @@
-# ⚡ AptosFlow
+AptosFlow: The AI-Powered Autonomous Agent for Aptos DeFi
+Our Vision: To build the autonomous execution layer for the Aptos ecosystem, transforming user intent into on-chain action.
 
-**Automate Your DeFi with Smart Workflows on Aptos**
+🔴 Try the Live Demo: aptos-flow.vercel.app
+🎬 Watch Our Demo Video
+(Replace the placeholder below with your YouTube link embed code after you upload the video)
 
-AptosFlow is a no-code automation platform for DeFi operations on the Aptos blockchain. Create powerful, event-driven workflows that execute automatically when specific conditions are met.
+The Problem: DeFi Never Sleeps, But You Do
+The Aptos network is a beacon of speed and efficiency, but engaging with its vibrant DeFi ecosystem is a manual, high-stress, 24/7 commitment. Users are forced to constantly monitor prices, track wallet activity, and manually execute complex, multi-step strategies across a dozen different protocols. This "decision fatigue" leads to missed opportunities, costly mistakes, and prevents the average user from harnessing the true power of decentralized finance.
 
-![AptosFlow Banner](https://via.placeholder.com/800x400/0f172a/38bdf8?text=AptosFlow+-+DeFi+Automation)
+We need an autopilot for our digital assets.
 
-## 🌟 Features
+The Solution: AptosFlow, Your Personal AI Agent
+AptosFlow is an on-chain automation protocol that translates natural language commands into autonomous DeFi strategies. It is a simple, elegant, and incredibly powerful platform that allows anyone—from beginners to seasoned degens—to build "if-this-then-that" workflows for their on-chain activities.
 
-- **🔗 No-Code Workflow Builder** - Create complex DeFi automations without writing code
-- **⚡ Real-time Triggers** - React to on-chain events like token receipts and price changes
-- **🎯 Smart Actions** - Automatically execute trades, rebalance LPs, and more
-- **🚀 Aptos Integration** - Native integration with Aptos blockchain and ecosystem protocols
-- **📱 Beautiful UI** - Modern, responsive interface with smooth animations
-- **🔐 Wallet Connect** - Secure wallet integration with multiple wallet providers
+By leveraging a high-speed AI, we translate user intent directly into structured, secure, on-chain workflows. No more complex forms, no more constant monitoring. You simply describe your strategy in plain English, and AptosFlow prepares it for autonomous execution.
 
-## 🛠 Supported Integrations
+Key Features & Why We Win
+We didn't just build a single feature; we built a complete, end-to-end system that is technically deep, polished, and visionary.
 
-### Triggers
-- **Receive APT** - When your wallet receives APT tokens
-- **Receive USDC** - When your wallet receives USDC tokens
-- **Price Changes** - When token prices move beyond thresholds
+✨ AI-Powered Natural Language Interface
+Our standout feature. We use the Groq API with the Llama 3 model to parse complex, multi-step user commands into a rich JSON structure. This isn't a simple chatbot; it's a true command interpreter that understands a wide range of DeFi triggers and actions.
 
-### Actions
-- **Token Swaps** (Tapp.Exchange) - Automatically swap tokens
-- **LP Rebalancing** (Hyperion) - Rebalance liquidity positions
-- **Perp Trading** (Kana Perps) - Execute perpetual futures trades
+User Prompt: "when apt comes, swap 70% to usdc on liquidswap and add rest to hyperion"
 
+AI Output:
+{
+  "trigger": { "type": "receive-token", "conditions": {"token": "apt"} },
+  "actions": [
+    { "type": "swap", "protocol": "liquidswap", "parameters": {"fromToken": "apt", "toToken": "usdc", "amount": 70}},
+    { "type": "add-liquidity", "protocol": "hyperion", "parameters": {"fromToken": "apt", "amount": 30}}
+  ]
+}
+🚀 Live Autonomous Execution Engine (Working Demo!)
+This is not just a concept. We have a working, end-to-end execution loop. Our Node.js backend listens for on-chain triggers via Nodit, and upon detecting a valid trigger, it autonomously calls our smart contract to execute the corresponding workflow. We successfully demonstrate this in our video, proving that AptosFlow is a true on-chain agent.
+
+🎨 Futuristic, Polished UI/UX
+We built an experience, not a prototype. Our "Aptos Aurora" theme, built with Next.js, Tailwind CSS, shadcn/ui, and Framer Motion, provides a beautiful, intuitive, and professional-grade interface that feels like a finished, funded startup.
+
+🧩 Composable by Design (On-Chain Payloads & Templates)
+AptosFlow is designed to be the glue for the Aptos ecosystem. Our AI and Templates page explicitly showcase how users can automate strategies for sponsors like Kana Perps, Hyperion, and Tapp.Exchange. Critically, we don't just store descriptions; we generate and store a structured, hex-encoded payload on-chain, proving the technical foundation for a truly expandable and trustless execution system.
+
+Why Aptos is the Perfect Foundation
+AptosFlow's vision of a decentralized, autonomous agent layer is only possible on a network like Aptos.
+
+Parallel Execution: Our vision is an ecosystem of thousands of autonomous agents executing workflows simultaneously. Aptos's Block-STM parallel execution engine is the only architecture that can handle this scale without creating a massive bottleneck.
+
+Low Gas Fees & Speed: The micro-transactions generated by our automation are only economically viable thanks to Aptos's consistently low fees and sub-second finality. Automation requires immediate and cheap confirmation, which Aptos provides.
+
+Move Language: The security and resource-oriented nature of Move is critical for building a platform where users' strategies and assets are managed. It provides the safety guarantees necessary for an autonomous system.
+
+Technical Architecture
+Category	Technology Used
+Frontend	Next.js, React, Tailwind CSS, shadcn/ui, Framer Motion
+AI Parser	Groq API (Llama 3 Model) via Next.js Serverless Functions
+Blockchain	Aptos (Move Language Smart Contract)
+Backend	Node.js, Express.js, Aptos TS-SDK
+Infra	Vercel (Deployment), Nodit (RPC Endpoint)
+
+Export to Sheets
+Bounty Integration
+We were deliberate in our integration of sponsor technologies as core components of our architecture:
+
+Nodit: We rely on Nodit's high-performance RPC Endpoint for all our blockchain interactions on both the frontend and backend. This was critical for building a stable, fast application and bypassing the rate-limiting issues of public testnets.
+
+Kana Perps, Hyperion, Tapp.Exchange: AptosFlow is fundamentally a composability layer. Our AI was specifically trained to understand commands related to these protocols, and our "Templates" page provides one-click recipes to automate strategies on their platforms, demonstrating our value as an ecosystem multiplier.
+
+Future Roadmap
+This hackathon is just the beginning. The future of AptosFlow includes:
+
+Fully Autonomous & Trustless Execution: Expanding our backend into a decentralized network of executors that can manage user funds in secure vaults, enabling fully trustless automation.
+
+Proactive AI Strategist: Evolving our AI from a command interpreter to a proactive strategist that can suggest, optimize, and even backtest new DeFi strategies for users.
+
+Thank you for your consideration.
 ## 🚀 Quick Start
 
 ### Prerequisites
