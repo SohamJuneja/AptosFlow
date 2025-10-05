@@ -27,6 +27,11 @@ const Header = () => {
           <Link href="/create">
             <Button variant="outline" className="bg-transparent hover:bg-white/10 hover:text-white transition-all hover:scale-105 cursor-pointer border-2 border-white/50 hover:border-white/80 px-4 py-2 rounded-lg text-white">Create Workflow</Button>
           </Link>
+          <Link href="/live-demo">
+            <Button variant="outline" className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 hover:from-green-500/30 hover:to-emerald-500/30 border-2 border-green-500/50 hover:border-green-500/80 px-4 py-2 rounded-lg text-white transition-all hover:scale-105 cursor-pointer">
+              🎬 Live Demo
+            </Button>
+          </Link>
           <div className="relative">
             {!account ? (
               <>
