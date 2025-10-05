@@ -1,5 +1,27 @@
 require('dotenv').config();
+const express = require('express');
 const { Aptos, AptosConfig, Network, Account, U64, Ed25519PrivateKey } = require("@aptos-labs/ts-sdk");
+
+// Health check HTTP server for cloud deployment
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.get('/', (req, res) => {
+  res.json({
+    status: 'running',
+    service: 'AptosFlow Autonomous Execution Engine',
+    executor: executorAccount.accountAddress.toString(),
+    message: 'Backend is monitoring blockchain for magic trigger transactions'
+  });
+});
+
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+app.listen(PORT, () => {
+  console.log(`🌐 Health check server running on port ${PORT}`);
+});
 
 // Aptos setup with Nodit priority
 let aptosConfig;
