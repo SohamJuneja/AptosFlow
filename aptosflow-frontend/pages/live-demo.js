@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useWallet } from '@aptos-labs/wallet-adapter-react';
 import { Aptos, AptosConfig, Network } from '@aptos-labs/ts-sdk';
 import { motion } from 'framer-motion';
+import Header from '@/components/Header';
 
 export default function LiveDemo() {
   const { account, signAndSubmitTransaction, connected } = useWallet();
@@ -44,8 +45,10 @@ export default function LiveDemo() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-700 to-indigo-800 p-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-700 to-indigo-800">
+      <Header />
+      <div className="p-8">
+        <div className="max-w-4xl mx-auto">
         
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -222,6 +225,7 @@ export default function LiveDemo() {
             💡 <strong>Backend is monitoring your wallet</strong> - it will automatically respond when it detects the magic trigger amount
           </p>
         </motion.div>
+        </div>
       </div>
     </div>
   );

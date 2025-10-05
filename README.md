@@ -73,6 +73,30 @@ Fully Autonomous & Trustless Execution: Expanding our backend into a decentraliz
 Proactive AI Strategist: Evolving our AI from a command interpreter to a proactive strategist that can suggest, optimize, and even backtest new DeFi strategies for users.
 
 Thank you for your consideration.
+
+## ⚠️ Important: Backend Deployment
+
+**The live demo at [aptos-flow.vercel.app](https://aptos-flow.vercel.app) currently only works when the backend execution engine is running.**
+
+### Current Setup:
+- ✅ **Frontend**: Deployed on Vercel (works globally)
+- ❌ **Backend**: Runs locally only (not deployed to a server)
+
+### What This Means:
+- The deployed site can send trigger transactions
+- But autonomous responses (0.001 APT back) only work when `real-execution-engine.js` is running on a server
+- For demos, you need to either:
+  1. Run the backend locally while testing, OR
+  2. Deploy the backend to a cloud service (Railway, Render, etc.)
+
+### To Deploy Backend (Coming Soon):
+We're working on deploying the backend to a cloud service for 24/7 autonomous execution. For now, you can run it locally:
+
+```bash
+# In the root directory
+node real-execution-engine.js
+```
+
 ## 🚀 Quick Start
 
 ### Prerequisites
